@@ -9,26 +9,21 @@
   ];
 
   const GROUP_CATALOG = {
-    'Evaluación Psicológica Base': {
+    'Evaluación Psicológica': {
       default: ['Operativo general', 'Administrativo', 'Supervisión'],
       'Secundaria completa': ['Operativo general', 'Apoyo logístico'],
       'Técnico completo': ['Técnico de campo', 'Supervisión'],
       'Universitario completo': ['Profesional senior', 'Coordinación']
     },
-    'Cuestionario de Riesgo Psicosocial': {
-      default: ['Riesgo psicosocial estándar', 'Riesgo psicosocial ampliado'],
-      'Universitario completo': ['Analista de riesgo', 'Coordinación SST']
+    'Riesgo Psicosocial': {
+      default: ['Operativo general', 'Administrativo'],
+      'Universitario completo': ['Analista SST', 'Coordinación SST']
     },
-    'Evaluación de Estrés': {
-      default: ['Operador en vigilancia', 'Operador de cabina'],
-      'Secundaria completa': ['Operador en vigilancia'],
-      'Técnico completo': ['Operador de cabina', 'Supervisor de turno']
-    },
-    'Perfil de Fatiga': {
+    'Fatiga y Somnolencia': {
       default: ['Operación minera', 'Conductores'],
       'Técnico completo': ['Conductores', 'Supervisor de ruta']
     },
-    'Evaluación de Conducción Segura': {
+    'Conducción Segura': {
       default: ['Conductores', 'Conductores de alto tonelaje'],
       'Secundaria completa': ['Conductores'],
       'Técnico completo': ['Conductores de alto tonelaje', 'Supervisor de flota']
@@ -486,21 +481,19 @@
 
   function buildDatabase() {
     const companies = ['Compañía Minera Andina', 'Transporte Río Azul', 'Operadora Pacífico', 'Servicios Integrales Kallpa', 'Consorcio San Gabriel'];
-    const examTypes = ['Preocupacional', 'Periódico', 'Retiro', 'Reincorporación'];
+    const examTypes = ['Preocupacional', 'Periódico'];
     const occupations = ['Operador de maquinaria', 'Asistente administrativo', 'Conductor de ruta', 'Supervisor de campo', 'Técnico electricista'];
     const prestations = [
-      'Evaluación Psicológica Base',
-      'Cuestionario de Riesgo Psicosocial',
-      'Evaluación de Estrés',
-      'Perfil de Fatiga',
-      'Evaluación de Conducción Segura'
+      'Evaluación Psicológica',
+      'Riesgo Psicosocial',
+      'Fatiga y Somnolencia',
+      'Conducción Segura'
     ];
     const testsByPrestation = {
-      'Evaluación Psicológica Base': ['Test de atención sostenida', 'Inventario emocional breve'],
-      'Cuestionario de Riesgo Psicosocial': ['Cuestionario FRP-12'],
-      'Evaluación de Estrés': ['Escala de estrés laboral', 'Escala de afrontamiento'],
-      'Perfil de Fatiga': ['Cuestionario de fatiga', 'Prueba de somnolencia'],
-      'Evaluación de Conducción Segura': ['Prueba de reflejos', 'Toma de decisiones en ruta']
+      'Evaluación Psicológica': ['BC2', 'BC3'],
+      'Riesgo Psicosocial': ['FRP-12'],
+      'Fatiga y Somnolencia': ['Epworth', 'Fatiga Laboral'],
+      'Conducción Segura': ['BC2', 'Tiempo de reacción']
     };
     const names = [
       ['Carlos','Ramírez','Huamán'],['Lucía','Mendoza','Paredes'],['Jorge','Vargas','Luna'],['Andrea','Soto','Quispe'],
@@ -532,7 +525,7 @@
           date,
           examType: examTypes[(index + e) % examTypes.length],
           occupation: occupations[(index + e) % occupations.length],
-          status: ['Pendiente','En proceso','Finalizado','Observado'][(index + e) % 4],
+          status: ['Pendiente','En proceso','Finalizado'][(index + e) % 3],
           allowRecovery: true,
           prestations: []
         };
@@ -544,9 +537,9 @@
             id: prId,
             description: desc,
             status: ['Pendiente','En proceso','Finalizado'][(index + p) % 3],
-            requiresGroup: ['Evaluación Psicológica Base','Cuestionario de Riesgo Psicosocial','Evaluación de Estrés','Evaluación de Conducción Segura'].includes(desc),
+            requiresGroup: ['Evaluación Psicológica','Riesgo Psicosocial','Conducción Segura'].includes(desc),
             allowRecovery: true,
-            groupSelected: index % 4 === 0 && p === 0 ? 'Operativo general' : '',
+            groupSelected: index % 4 === 0 && p === 0 ? (desc === 'Conducción Segura' ? 'Conductores' : 'Operativo general') : '',
             groupStatus: '',
             tests: []
           };
@@ -576,11 +569,11 @@
       code: `BC${n + 2}`,
       date: `${String(10 + n).padStart(2,'0')}/0${(seed % 3) + 1}/2025`,
       source: testName,
-      summary: `Resultado previo ${n + 1} del paciente ${patient.names} ${patient.lastName}`,
+      summary: `Registro previo ${n + 1} de ${testName} del paciente ${patient.names} ${patient.lastName}`,
       results: [
-        `Nivel de estrés: ${['Leve','Moderado','Alto'][n % 3]}`,
+        `Resultado: ${['Dentro de rango','En seguimiento','Requiere revisión'][n % 3]}`,
         `Puntaje total: ${52 + seed + n}`,
-        `Observación: ${['Sin alertas críticas','Requiere seguimiento','Sugiere reevaluación'][n % 3]}`
+        `Observación: ${['Sin alertas críticas','Requiere seguimiento','Sugerir reevaluación'][n % 3]}`
       ]
     }));
   }
