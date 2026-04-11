@@ -35,7 +35,7 @@
     filteredPatients: [],
     openPatients: new Set(),
     openEpisodes: new Set(),
-    openPrestations: new Set(),
+    openSections: new Set(),
     selectedRecoveryContext: null,
     selectedGroupContext: null,
     pendingReplicaAction: null,
@@ -48,7 +48,6 @@
     fillFilterOptions();
     bindEvents();
     seedDefaultFilters();
-    state.openPatients = new Set(DB.slice(0, 4).map((p) => p.id));
     applyFilters();
   });
 
@@ -192,82 +191,134 @@
   function renderPatientDetail(patient) {
     return `
       <div class="ep-detail-wrap">
-        ${patient._visibleEpisodes.map((episode) => renderEpisode(patient, episode)).join('')}
+        <div class="ep-detail-card ep-structured-panel mb-3">
+          <div class="ep-episodes-list">
+            ${patient._visibleEpisodes.map((episode) => renderEpisode(patient, episode)).join('')}
+          </div>
+        </div>
       </div>
     `;
   }
 
   function renderEpisode(patient, episode) {
-    const canRecoverEpisode = episode.prestations.some((pr) => pr.tests.some((test) => test.status === 'Pendiente' && test.allowRecovery && pr.allowRecovery && episode.allowRecovery));
+    const episodeKey = `${patient.id}::${episode.id}`;
+    const isOpen = state.openEpisodes.has(episodeKey);
     return `
-      <div class="ep-detail-card ep-structured-panel mb-3">
-        <div class="ep-detail-wrap">
-          <div class="ep-structured-title">EPISODIOS - ACTUACIONES</div>
+      <section class="ep-episode-card ${isOpen ? 'is-open' : ''}">
+        <button
+          type="button"
+          class="ep-episode-card-header"
+          data-ep-action="toggle-episode"
+          data-patient-id="${patient.id}"
+          data-episode-id="${episode.id}"
+          aria-expanded="${isOpen ? 'true' : 'false'}"
+          aria-label="${isOpen ? 'Contraer episodio' : 'Expandir episodio'}"
+        >
+          <span class="ep-episode-card-header-text">EPISODIO · ${escapeHtml(episode.examType)} · ${formatDate(episode.date)}</span>
+          <span class="ep-episode-card-chevron"><i class="fas fa-chevron-down"></i></span>
+        </button>
 
-          <div class="ep-structured-block">
-            <div class="ep-block-title">EPISODIO</div>
-            <table class="ep-plain-table">
-              <thead>
-                <tr>
-                  <th>Fecha</th>
-                  <th>Tipo de Examen</th>
-                  <th>Grado Instrucción</th>
-                  <th>Ocupación</th>
-                  <th>Estado</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>${formatDate(episode.date)}</td>
-                  <td>${escapeHtml(episode.examType)}</td>
-                  <td>${patient.education ? escapeHtml(patient.education) : '<span class="text-warning fw-semibold">No registrado</span>'}</td>
-                  <td>${escapeHtml(episode.occupation)}</td>
-                  <td>${escapeHtml(episode.status)}</td>
-                  <td class="ep-actions-cell">
-                    ${canRecoverEpisode ? `<button type="button" class="ep-icon-btn ep-icon-btn-secondary" data-bs-toggle="tooltip" data-bs-placement="top" title="Recuperación de datos" data-ep-action="open-recovery" data-patient-id="${patient.id}" data-episode-id="${episode.id}" data-prestation-id="${episode.prestations[0].id}" data-test-id="${episode.prestations[0].tests[0].id}" aria-label="Recuperación de datos"><i class="fas fa-database"></i></button>` : '<span class="text-muted small">—</span>'}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+        <div class="ep-episode-card-panel">
+          <div class="ep-episode-card-panel-inner">
+            ${renderCollapsibleSection({
+              key: `${episodeKey}::episode`,
+              title: 'EPISODIO',
+              content: `
+                <table class="ep-plain-table">
+                  <thead>
+                    <tr>
+                      <th>Fecha</th>
+                      <th>Tipo de Examen</th>
+                      <th>Grado de Instrucción</th>
+                      <th>Ocupación</th>
+                      <th>Estado</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${renderEpisodeInfo(patient, episode)}
+                  </tbody>
+                </table>`
+            })}
 
-          <div class="ep-structured-block">
-            <div class="ep-block-title">ACTUACIONES</div>
-            <table class="ep-plain-table">
-              <thead>
-                <tr>
-                  <th>Descripción Actuación</th>
-                  <th>Vinculado Grupo Ocupacional</th>
-                  <th>Estado</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${renderPrestations(patient, episode)}
-              </tbody>
-            </table>
-          </div>
+            ${renderCollapsibleSection({
+              key: `${episodeKey}::prestations`,
+              title: 'ACTUACIONES',
+              content: `
+                <table class="ep-plain-table">
+                  <thead>
+                    <tr>
+                      <th>Descripción Actuación</th>
+                      <th>Vinculado Grupo Ocupacional</th>
+                      <th>Estado</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${renderPrestations(patient, episode)}
+                  </tbody>
+                </table>`
+            })}
 
-          <div class="ep-structured-block">
-            <div class="ep-block-title">PRUEBAS</div>
-            <table class="ep-plain-table">
-              <thead>
-                <tr>
-                  <th>Descripción Prueba</th>
-                  <th>Duración</th>
-                  <th>Estado</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${renderTests(patient, episode)}
-              </tbody>
-            </table>
+            ${renderCollapsibleSection({
+              key: `${episodeKey}::tests`,
+              title: 'PRUEBAS',
+              content: `
+                <table class="ep-plain-table">
+                  <thead>
+                    <tr>
+                      <th>Descripción Prueba</th>
+                      <th>Duración</th>
+                      <th>Estado</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${renderTests(patient, episode)}
+                  </tbody>
+                </table>`
+            })}
           </div>
         </div>
-      </div>
-      </div>
+      </section>
+    `;
+  }
+
+  function renderCollapsibleSection({ key, title, content }) {
+    const isOpen = state.openSections.has(key);
+    return `
+      <section class="ep-inner-section ${isOpen ? 'is-open' : ''}">
+        <button
+          type="button"
+          class="ep-inner-section-trigger"
+          data-ep-action="toggle-section"
+          data-section-key="${key}"
+          aria-expanded="${isOpen ? 'true' : 'false'}"
+          aria-label="${isOpen ? 'Contraer sección' : 'Expandir sección'}"
+        >
+          <span>${title}</span>
+          <span class="ep-inner-section-chevron"><i class="fas fa-chevron-down"></i></span>
+        </button>
+        <div class="ep-inner-section-panel">
+          <div class="ep-inner-section-body">${content}</div>
+        </div>
+      </section>
+    `;
+  }
+
+  function renderEpisodeInfo(patient, episode) {
+    const canRecover = episode.allowRecovery && episode.prestations.some((pr) => pr.allowRecovery && pr.tests.some((test) => test.status === 'Pendiente' && test.allowRecovery));
+    return `
+      <tr>
+        <td>${formatDate(episode.date)}</td>
+        <td>${escapeHtml(episode.examType)}</td>
+        <td>${escapeHtml(patient.education || 'Sin registrar')}</td>
+        <td>${escapeHtml(episode.occupation)}</td>
+        <td>${statusBadge(episode.status)}</td>
+        <td class="ep-actions-cell">
+          ${canRecover ? `<button type="button" class="ep-icon-btn ep-icon-btn-secondary" data-bs-toggle="tooltip" data-bs-placement="top" title="Recuperación de datos" data-ep-action="open-recovery" data-patient-id="${patient.id}" data-episode-id="${episode.id}" data-prestation-id="${episode.prestations[0].id}" data-test-id="${episode.prestations[0].tests[0].id}" aria-label="Recuperación de datos"><i class="fas fa-database"></i></button>` : '<span class="text-muted small">—</span>'}
+        </td>
+      </tr>
     `;
   }
 
@@ -313,6 +364,29 @@
     const action = btn.dataset.epAction;
     if (action === 'toggle-patient') {
       toggleSet(state.openPatients, btn.dataset.patientId);
+      renderPatients();
+      return;
+    }
+    if (action === 'toggle-episode') {
+      const patientId = btn.dataset.patientId;
+      const episodeId = btn.dataset.episodeId;
+      const episodeKey = `${patientId}::${episodeId}`;
+      const nextOpen = !state.openEpisodes.has(episodeKey);
+      Array.from(state.openEpisodes).forEach((key) => {
+        if (key.startsWith(`${patientId}::`)) state.openEpisodes.delete(key);
+      });
+      Array.from(state.openSections).forEach((key) => {
+        if (key.startsWith(`${episodeKey}::`)) state.openSections.delete(key);
+      });
+      if (nextOpen) state.openEpisodes.add(episodeKey);
+      renderPatients();
+      return;
+    }
+    if (action === 'toggle-section') {
+      const sectionKey = btn.dataset.sectionKey;
+      const nextOpen = !state.openSections.has(sectionKey);
+      state.openSections.delete(sectionKey);
+      if (nextOpen) state.openSections.add(sectionKey);
       renderPatients();
       return;
     }
