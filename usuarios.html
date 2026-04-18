@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SEPO - Usuarios</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="css/styles.css" rel="stylesheet" />
+    <link href="css/usuarios.css" rel="stylesheet" />
+  </head>
+  <body data-theme="default" data-mode="light">
+    <nav class="sidebar" id="us_sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-logo-text" id="us_sidebarBrandBtn" role="button" tabindex="0">
+          <i class="fas fa-brain fa-fw" title="Expandir/Contraer menú"></i>
+          <span class="brand-text">SEPO</span>
+        </div>
+        <div class="toggle-btn" id="us_sidebarToggle" title="Contraer menú">
+          <i class="fas fa-bars fa-fw"></i>
+        </div>
+      </div>
+      <div class="sidebar-scroll">
+      <div class="sidebar-section mt-2"><span>Principal</span></div>
+      <ul class="nav flex-column">
+        <li><a class="nav-link " href="index.html#dashboard" title="Dashboard"><i class="fas fa-th-large fa-fw"></i><span>Dashboard</span></a></li>
+        <li><a class="nav-link " href="index.html#pruebas" title="Pruebas Psicológicas"><i class="fas fa-file-medical-alt fa-fw"></i><span>Pruebas Psicológicas</span></a></li>
+        <li><a class="nav-link " href="episodios.html" title="Episodios"><i class="fas fa-notes-medical fa-fw"></i><span>Episodios</span></a></li>
+        <li><a class="nav-link " href="resultados.html" title="Resultados"><i class="fas fa-chart-line fa-fw"></i><span>Resultados</span></a></li>
+      </ul>
+
+      <div class="sidebar-section mt-4"><span>Mantenimientos</span></div>
+      <ul class="nav flex-column">
+        <li><a class="nav-link " href="index.html#centros" title="Centros Médicos"><i class="fas fa-hospital fa-fw"></i><span>Centros Médicos</span></a></li>
+        <li><a class="nav-link " href="index.html#grado" title="Grado de Instrucción"><i class="fas fa-graduation-cap fa-fw"></i><span>Grado de Instrucción</span></a></li>
+        <li><a class="nav-link " href="index.html#ocupaciones" title="Ocupaciones"><i class="fas fa-briefcase fa-fw"></i><span>Ocupaciones</span></a></li>
+        <li><a class="nav-link " href="index.html#grupos" title="Grupos Ocupacionales"><i class="fas fa-users fa-fw"></i><span>Grupos Ocupacionales</span></a></li>
+        <li><a class="nav-link " href="index.html#prestaciones" title="Prestaciones"><i class="fas fa-stethoscope fa-fw"></i><span>Prestaciones</span></a></li>
+        <li><a class="nav-link " href="index.html#fichas" title="Fichas"><i class="fas fa-clipboard-list fa-fw"></i><span>Fichas</span></a></li>
+      </ul>
+
+      <div class="sidebar-section mt-4"><span>Configuración</span></div>
+      <ul class="nav flex-column">
+        <li><a class="nav-link " href="reportes.html" title="Reportes"><i class="fas fa-file-export fa-fw"></i><span>Reportes</span></a></li>
+        <li><a class="nav-link " href="roles.html" title="Roles"><i class="fas fa-user-shield fa-fw"></i><span>Roles</span></a></li>
+        <li><a class="nav-link active" href="usuarios.html" title="Usuarios"><i class="fas fa-user fa-fw"></i><span>Usuarios</span></a></li>
+        <li><a class="nav-link " href="parametros.html" title="Parámetros"><i class="fas fa-sliders-h fa-fw"></i><span>Parámetros</span></a></li>
+        <li><a class="nav-link " href="index.html#orden" title="Orden de Prestaciones"><i class="fas fa-sort fa-fw"></i><span>Orden de Prestaciones</span></a></li>
+      </ul>
+      </div>
+
+      <div class="sidebar-footer">
+        <a class="nav-link nav-link-settings" href="#" onclick="abrirConfiguracionVisual(); return false;" title="Configuración visual"><i class="fas fa-sliders-h fa-fw"></i><span>Configuración</span></a>
+      </div>
+    </nav>
+
+    <main class="main-content" id="us_mainContent">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title"><i class="fas fa-user me-2"></i>Usuarios</h1>
+          <p class="page-subtitle">Gestione usuarios del sistema, sus roles asignados y su estado actual.</p>
+        </div>
+      </div>
+
+      <section class="card us-card mb-4" id="us_filterCard">
+        <div class="card-body us-card-body">
+          <div class="us-card-title-row mb-3">
+            <div>
+              <h2 class="us-section-title mb-1"><i class="fas fa-filter me-2"></i>Filtros de búsqueda</h2>
+              <p class="text-muted small mb-0">Ubique usuarios por documento, nombres, rol, sede o estado.</p>
+            </div>
+            <div class="us-actions-row">
+              <button type="button" class="btn btn-light rounded-pill px-3" id="us_btnLimpiar"><i class="fas fa-eraser me-1"></i>Limpiar</button>
+              <button type="button" class="btn btn-primary rounded-pill px-3" id="us_btnBuscar"><i class="fas fa-search me-1"></i>Buscar</button>
+              <button type="button" class="btn btn-primary rounded-pill px-3" id="us_btnCrear"><i class="fas fa-plus me-1"></i>Crear</button>
+            </div>
+          </div>
+
+          <div class="us-filter-grid">
+            <div class="us-filter-row">
+              <label class="us-filter-label" for="us_filtroDocumento">Número de identificación:</label>
+              <div class="us-filter-control"><input class="form-control" id="us_filtroDocumento" placeholder="Ej. 72845129" /></div>
+            </div>
+            <div class="us-filter-row">
+              <label class="us-filter-label" for="us_filtroNombre">Nombres y apellidos:</label>
+              <div class="us-filter-control"><input class="form-control" id="us_filtroNombre" placeholder="Buscar por nombre" /></div>
+            </div>
+            <div class="us-filter-row">
+              <label class="us-filter-label" for="us_filtroRol">Rol:</label>
+              <div class="us-filter-control">
+                <select class="form-select" id="us_filtroRol"><option value="">[Todos]</option></select>
+              </div>
+            </div>
+            <div class="us-filter-row">
+              <label class="us-filter-label" for="us_filtroSede">Sedes:</label>
+              <div class="us-filter-control">
+                <select class="form-select" id="us_filtroSede"><option value="">[Todas]</option></select>
+              </div>
+            </div>
+            <div class="us-filter-row">
+              <label class="us-filter-label" for="us_filtroEstado">Estado:</label>
+              <div class="us-filter-control">
+                <select class="form-select" id="us_filtroEstado">
+                  <option value="">[Todos]</option>
+                  <option value="Activo">Activo</option>
+                  <option value="Inactivo">Inactivo</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card us-card" id="us_gridCard">
+        <div class="card-body us-card-body">
+          <div class="us-card-title-row mb-3">
+            <div>
+              <h2 class="us-section-title mb-1"><i class="fas fa-table me-2"></i>Usuarios registrados</h2>
+              <p class="text-muted small mb-0">Edite la información del usuario o elimínelo del prototipo.</p>
+            </div>
+            <div class="us-preview-meta" id="us_totalUsuarios"></div>
+          </div>
+          <div class="table-responsive">
+            <table class="table align-middle us-table" id="us_tablaUsuarios">
+              <thead>
+                <tr>
+                  <th>Número de identificación</th>
+                  <th>Nombres y apellidos</th>
+                  <th>Rol</th>
+                  <th>Estado</th>
+                  <th class="text-center">Acciones</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="modal fade" id="us_modalUsuario" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content us-modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title mb-0" id="us_modalTitle">Crear usuario</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row g-3 us-form-block">
+              <div class="col-md-4">
+                <label class="form-label" for="us_inputDocumento">Número de identificación</label>
+                <input class="form-control" id="us_inputDocumento" maxlength="12" />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="us_inputNombres">Nombres</label>
+                <input class="form-control" id="us_inputNombres" maxlength="60" />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="us_inputApellidos">Apellidos</label>
+                <input class="form-control" id="us_inputApellidos" maxlength="60" />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="us_inputRol">Rol</label>
+                <select class="form-select" id="us_inputRol"></select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="us_inputSede">Sede</label>
+                <select class="form-select" id="us_inputSede"></select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="us_inputEstado">Estado</label>
+                <select class="form-select" id="us_inputEstado">
+                  <option value="Activo">Activo</option>
+                  <option value="Inactivo">Inactivo</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-light rounded-pill px-3" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-primary rounded-pill px-3" id="us_btnGuardar"><i class="fas fa-save me-1"></i>Grabar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+      <div class="toast align-items-center text-bg-dark border-0" id="us_toast" role="status" aria-live="polite" aria-atomic="true">
+        <div class="d-flex">
+          <div class="toast-body" id="us_toastBody">Acción realizada.</div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/modules/bootstrap.js"></script>
+    <script src="js/modules/usuarios.js"></script>
+      <script src="js/modules/shared-sidebar.js"></script>
+</body>
+</html>

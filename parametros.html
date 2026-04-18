@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SEPO - Parámetros</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="css/styles.css" rel="stylesheet" />
+    <link href="css/parametros.css" rel="stylesheet" />
+  </head>
+  <body data-theme="classic" data-mode="light">
+    <nav class="sidebar" id="pm_sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-logo-text" id="pm_sidebarBrandBtn" role="button" tabindex="0">
+          <i class="fas fa-brain fa-fw" title="Expandir/Contraer menú"></i>
+          <span class="brand-text">SEPO</span>
+        </div>
+        <div class="toggle-btn" id="pm_sidebarToggle" title="Contraer menú">
+          <i class="fas fa-bars fa-fw"></i>
+        </div>
+      </div>
+      <div class="sidebar-scroll">
+      <div class="sidebar-section mt-2"><span>Principal</span></div>
+      <ul class="nav flex-column">
+        <li><a class="nav-link " href="index.html#dashboard" title="Dashboard"><i class="fas fa-th-large fa-fw"></i><span>Dashboard</span></a></li>
+        <li><a class="nav-link " href="index.html#pruebas" title="Pruebas Psicológicas"><i class="fas fa-file-medical-alt fa-fw"></i><span>Pruebas Psicológicas</span></a></li>
+        <li><a class="nav-link " href="episodios.html" title="Episodios"><i class="fas fa-notes-medical fa-fw"></i><span>Episodios</span></a></li>
+        <li><a class="nav-link " href="resultados.html" title="Resultados"><i class="fas fa-chart-line fa-fw"></i><span>Resultados</span></a></li>
+      </ul>
+
+      <div class="sidebar-section mt-4"><span>Mantenimientos</span></div>
+      <ul class="nav flex-column">
+        <li><a class="nav-link " href="index.html#centros" title="Centros Médicos"><i class="fas fa-hospital fa-fw"></i><span>Centros Médicos</span></a></li>
+        <li><a class="nav-link " href="index.html#grado" title="Grado de Instrucción"><i class="fas fa-graduation-cap fa-fw"></i><span>Grado de Instrucción</span></a></li>
+        <li><a class="nav-link " href="index.html#ocupaciones" title="Ocupaciones"><i class="fas fa-briefcase fa-fw"></i><span>Ocupaciones</span></a></li>
+        <li><a class="nav-link " href="index.html#grupos" title="Grupos Ocupacionales"><i class="fas fa-users fa-fw"></i><span>Grupos Ocupacionales</span></a></li>
+        <li><a class="nav-link " href="index.html#prestaciones" title="Prestaciones"><i class="fas fa-stethoscope fa-fw"></i><span>Prestaciones</span></a></li>
+        <li><a class="nav-link " href="index.html#fichas" title="Fichas"><i class="fas fa-clipboard-list fa-fw"></i><span>Fichas</span></a></li>
+      </ul>
+
+      <div class="sidebar-section mt-4"><span>Configuración</span></div>
+      <ul class="nav flex-column">
+        <li><a class="nav-link " href="reportes.html" title="Reportes"><i class="fas fa-file-export fa-fw"></i><span>Reportes</span></a></li>
+        <li><a class="nav-link " href="roles.html" title="Roles"><i class="fas fa-user-shield fa-fw"></i><span>Roles</span></a></li>
+        <li><a class="nav-link " href="usuarios.html" title="Usuarios"><i class="fas fa-user fa-fw"></i><span>Usuarios</span></a></li>
+        <li><a class="nav-link active" href="parametros.html" title="Parámetros"><i class="fas fa-sliders-h fa-fw"></i><span>Parámetros</span></a></li>
+        <li><a class="nav-link " href="index.html#orden" title="Orden de Prestaciones"><i class="fas fa-sort fa-fw"></i><span>Orden de Prestaciones</span></a></li>
+      </ul>
+      </div>
+
+      <div class="sidebar-footer">
+        <a class="nav-link nav-link-settings" href="#" onclick="abrirConfiguracionVisual(); return false;" title="Configuración visual"><i class="fas fa-sliders-h fa-fw"></i><span>Configuración</span></a>
+      </div>
+    </nav>
+
+    <main class="main-content" id="pm_mainContent">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title"><i class="fas fa-sliders-h me-2"></i>Parámetros</h1>
+          <p class="page-subtitle">Mantenimiento de configuraciones maestras del sistema: búsqueda, edición, activación, inactivación y simulación de impacto en otros módulos.</p>
+        </div>
+        <div class="pm-header-actions">
+          <span class="pm-pill"><i class="fas fa-database"></i> Prototipo con datos simulados</span>
+          <button type="button" class="btn btn-primary btn-sm rounded-pill px-3" id="pm_btnNuevoHeader"><i class="fas fa-plus me-1"></i>Nuevo parámetro</button>
+          <a href="index.html" class="btn btn-outline-primary btn-sm rounded-pill px-3"><i class="fas fa-arrow-left me-1"></i>Volver a pruebas</a>
+        </div>
+      </div>
+
+      <section class="card pm-card mb-4" id="pm_filtrosCard">
+        <div class="card-body pm-filter-card-body">
+          <div class="pm-filter-head">
+            <div>
+              <h2 class="pm-filter-title mb-1">FILTROS DE BÚSQUEDA</h2>
+              <p class="text-muted small mb-0">Ubica parámetros por código, descripción, valor y estado. También puedes enfocarte por tipo de configuración.</p>
+            </div>
+            <div class="pm-filter-actions">
+              <button type="button" class="btn btn-light rounded-pill px-3" id="pm_btnLimpiar"><i class="fas fa-eraser me-1"></i>Limpiar</button>
+              <button type="button" class="btn btn-primary rounded-pill px-3" id="pm_btnBuscar"><i class="fas fa-search me-1"></i>Buscar</button>
+            </div>
+          </div>
+
+          <div class="pm-filter-grid">
+            <div class="pm-filter-row">
+              <label class="pm-filter-label" for="pm_filtroCodigo">Código:</label>
+              <div class="pm-filter-control"><input class="form-control" id="pm_filtroCodigo" placeholder="Ej. PRM-001" /></div>
+            </div>
+            <div class="pm-filter-row">
+              <label class="pm-filter-label" for="pm_filtroDescripcion">Descripción:</label>
+              <div class="pm-filter-control"><input class="form-control" id="pm_filtroDescripcion" placeholder="Buscar por descripción" /></div>
+            </div>
+            <div class="pm-filter-row">
+              <label class="pm-filter-label" for="pm_filtroValor">Valor:</label>
+              <div class="pm-filter-control"><input class="form-control" id="pm_filtroValor" placeholder="Buscar por valor configurado" /></div>
+            </div>
+            <div class="pm-filter-row">
+              <label class="pm-filter-label" for="pm_filtroEstado">Estado:</label>
+              <div class="pm-filter-control">
+                <select class="form-select" id="pm_filtroEstado">
+                  <option value="">[Todos]</option>
+                  <option value="Activo">Activo</option>
+                  <option value="Inactivo">Inactivo</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="pm-chipbar" id="pm_chipbar"></div>
+        </div>
+      </section>
+
+      <section class="card pm-card" id="pm_panelResultados">
+        <div class="card-body">
+          <div class="pm-card-title-row mb-3">
+            <div>
+              <h2 class="pm-section-title mb-1"><i class="fas fa-list-check me-2"></i>Parámetros configurados</h2>
+              <p class="text-muted small mb-0">Cada registro representa un valor maestro que luego impacta en otros mantenimientos o pantallas del sistema.</p>
+            </div>
+            <div class="pm-result-actions">
+              <div class="pm-result-summary" id="pm_resultSummary"></div>
+              <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3" id="pm_btnNuevo"><i class="fas fa-plus me-1"></i>Nuevo parámetro</button>
+            </div>
+          </div>
+
+          <div class="table-responsive" id="pm_tablaWrap">
+            <table class="table align-middle pm-table" id="pm_tablaParametros">
+              <thead>
+                <tr>
+                  <th>Código</th>
+                  <th>Descripción</th>
+                  <th>Valor</th>
+                  <th>Tipo</th>
+                  <th>Módulo relacionado</th>
+                  <th>Estado</th>
+                  <th style="width: 158px">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="pm_tablaBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="card pm-card mt-4" id="pm_panelImpacto">
+        <div class="card-body">
+          <div class="pm-card-title-row mb-3">
+            <div>
+              <h2 class="pm-section-title mb-1"><i class="fas fa-satellite-dish me-2"></i>Simulación de impacto</h2>
+              <p class="text-muted small mb-0">Vista referencial de cómo se sentirían otros módulos después de configurar los parámetros activos.</p>
+            </div>
+            <div class="pm-impact-legend">Actualización automática según el listado actual</div>
+          </div>
+
+          <div class="pm-impact-grid">
+            <article class="pm-impact-card">
+              <div class="pm-impact-head">
+                <span class="pm-impact-icon" id="pm_previewPrestacionIcon"><i class="fas fa-stethoscope"></i></span>
+                <div>
+                  <h3>Prestaciones</h3>
+                  <p>Mantenimiento operativo</p>
+                </div>
+              </div>
+              <div class="pm-impact-body">
+                <div class="pm-impact-line"><span>Ícono activo:</span> <strong id="pm_previewPrestacionLabel">fa-stethoscope</strong></div>
+                <div class="pm-impact-line"><span>Estado:</span> <strong id="pm_previewPrestacionState">Disponible</strong></div>
+                <div class="pm-impact-tag">Simula el selector de íconos para prestaciones</div>
+              </div>
+            </article>
+
+            <article class="pm-impact-card">
+              <div class="pm-impact-head">
+                <span class="pm-impact-icon" id="pm_previewPruebaIcon"><i class="fas fa-brain"></i></span>
+                <div>
+                  <h3>Prueba psicológica</h3>
+                  <p>Apoyo visual y audio</p>
+                </div>
+              </div>
+              <div class="pm-impact-body">
+                <div class="pm-impact-line"><span>Ícono activo:</span> <strong id="pm_previewPruebaLabel">fa-brain</strong></div>
+                <div class="pm-impact-line"><span>Audio:</span> <strong id="pm_previewAudioState">Sí</strong></div>
+                <div class="pm-audio-pill" id="pm_previewAudioPill"><i class="fas fa-volume-up"></i> Audio habilitado para la prueba activa</div>
+              </div>
+            </article>
+
+            <article class="pm-impact-card">
+              <div class="pm-impact-head">
+                <span class="pm-impact-icon"><i class="fas fa-file-signature"></i></span>
+                <div>
+                  <h3>Portadas RTF</h3>
+                  <p>Documentos y salidas impresas</p>
+                </div>
+              </div>
+              <div class="pm-impact-body">
+                <div class="pm-impact-line"><span>Plantilla principal:</span> <strong id="pm_previewPlantilla">portada_general.rtf</strong></div>
+                <div class="pm-impact-ribbon">RTF ACTIVO</div>
+                <div class="pm-mini-sheet">
+                  <div class="pm-mini-sheet-title" id="pm_previewPortadaNombre">Portada General Ocupacional</div>
+                  <div class="pm-mini-sheet-meta">Documento de salida listo para impresión o exportación</div>
+                </div>
+              </div>
+            </article>
+
+            <article class="pm-impact-card">
+              <div class="pm-impact-head">
+                <span class="pm-impact-icon"><i class="fas fa-image"></i></span>
+                <div>
+                  <h3>Imágenes</h3>
+                  <p>Tamaño aplicado por categoría</p>
+                </div>
+              </div>
+              <div class="pm-impact-body">
+                <div class="pm-impact-line"><span>Tamaño vigente:</span> <strong id="pm_previewImagenSize">Grande</strong></div>
+                <div class="pm-image-stage"><div class="pm-image-preview size-grande" id="pm_previewImageBox"></div></div>
+                <div class="pm-impact-tag" id="pm_previewImageTag">Categoría portada con tamaño Grande</div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="modal fade" id="pm_modalEditor" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content pm-modal">
+          <div class="modal-header">
+            <h5 class="modal-title" id="pm_modalTitle"><i class="fas fa-sliders-h me-2"></i>Nuevo parámetro</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <div class="pm-context-box mb-3" id="pm_editorContexto">Completa la configuración del parámetro. Los cambios se verán reflejados de forma inmediata en la demo.</div>
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label" for="pm_formCodigo">Código</label>
+                <input class="form-control" id="pm_formCodigo" maxlength="20" />
+              </div>
+              <div class="col-md-8">
+                <label class="form-label" for="pm_formDescripcion">Descripción</label>
+                <input class="form-control" id="pm_formDescripcion" maxlength="140" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="pm_formTipo">Tipo</label>
+                <select class="form-select" id="pm_formTipo"></select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="pm_formModulo">Módulo relacionado</label>
+                <select class="form-select" id="pm_formModulo"></select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="pm_formEstado">Estado</label>
+                <select class="form-select" id="pm_formEstado">
+                  <option value="Activo">Activo</option>
+                  <option value="Inactivo">Inactivo</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Aplicación simulada</label>
+                <div class="pm-form-hint-card" id="pm_formHint">Configura un valor general o específico para que el sistema lo use en otros módulos.</div>
+              </div>
+            </div>
+
+            <div class="pm-dynamic-fields mt-4" id="pm_dynamicFields"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-light rounded-pill px-3" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-primary rounded-pill px-3" id="pm_btnGuardar">Guardar parámetro</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="pm_modalConfirm" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content pm-modal">
+          <div class="modal-header">
+            <h5 class="modal-title"><i class="fas fa-shield-alt me-2"></i>Confirmar acción</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <div class="pm-context-box" id="pm_confirmMessage">¿Deseas continuar?</div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-light rounded-pill px-3" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-primary rounded-pill px-3" id="pm_btnConfirmar">Sí, continuar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+      <div class="toast align-items-center text-white bg-success border-0 pr-toast" id="pm_toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+          <div class="toast-body d-flex align-items-center fw-medium"><i class="fas fa-check-circle me-2"></i><span id="pm_toastBody">Registro guardado correctamente.</span></div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/modules/bootstrap.js"></script>
+    <script src="js/modules/parametros-demo.js"></script>
+      <script src="js/modules/shared-sidebar.js"></script>
+</body>
+</html>
