@@ -89,6 +89,18 @@
               <label class="rs-filter-label" for="rs_filtroOcupacion">Ocupación:</label>
               <div class="rs-filter-control"><input class="form-control" id="rs_filtroOcupacion" list="rs_ocupacionesList" /></div>
             </div>
+            <div class="rs-filter-row">
+              <label class="rs-filter-label" for="rs_filtroDniSearch">DNI:</label>
+              <div class="rs-filter-control rs-dni-searchbox" id="rs_dniSearchbox">
+                <input type="hidden" id="rs_filtroDni" />
+                <div class="rs-dni-searchbox-shell">
+                  <i class="fas fa-id-card rs-dni-searchbox-icon" aria-hidden="true"></i>
+                  <input class="form-control rs-dni-searchbox-input" id="rs_filtroDniSearch" type="text" placeholder="Buscar DNI o paciente..." autocomplete="off" inputmode="numeric" />
+                  <button type="button" class="rs-dni-searchbox-clear" id="rs_btnLimpiarDni" aria-label="Limpiar DNI"><i class="fas fa-xmark"></i></button>
+                </div>
+                <div class="rs-dni-searchbox-menu" id="rs_dniSearchboxMenu" role="listbox"></div>
+              </div>
+            </div>
             <div class="rs-filter-row rs-filter-row-dates">
               <label class="rs-filter-label" for="rs_filtroFechaDesde">Fecha de examen:</label>
               <div class="rs-filter-date-wrap"><input type="date" class="form-control" id="rs_filtroFechaDesde" /></div>
@@ -141,6 +153,7 @@
                 <tr>
                   <th>Episodio</th>
                   <th>Historia clínica</th>
+                  <th>DNI</th>
                   <th>Paciente</th>
                   <th>Empresa</th>
                   <th>Ocupación</th>

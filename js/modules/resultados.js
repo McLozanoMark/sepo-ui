@@ -4,6 +4,7 @@
     filteredRecords: [],
     selectedRecord: null,
     pendingAction: null,
+    dniSearchboxOpen: false,
     bootstrap: { mainModal: null, confirmModal: null, toast: null, tooltips: [] },
   };
 
@@ -19,6 +20,7 @@
     state.bootstrap.toast = new bootstrap.Toast(document.getElementById('rs_toast'), { delay: 2200 });
 
     fillFilterOptions();
+    setupDniSearchbox();
     bindEvents();
     renderTable();
   }
@@ -69,14 +71,116 @@
     const pruebas = [...new Set(state.records.flatMap((r) => r.pruebas.map((p) => p.nombre)))].sort();
     const factores = [...new Set(state.records.flatMap((r) => r.pruebas.flatMap((p) => p.factores.map((f) => f.nombre))))].sort();
 
+    state.dniOptions = state.records
+      .map((r) => ({ dni: r.dni, paciente: r.paciente, historiaClinica: r.historiaClinica }))
+      .filter((item) => item.dni)
+      .sort((a, b) => a.dni.localeCompare(b.dni));
+
     document.getElementById('rs_empresasList').innerHTML = companies.map((v) => `<option value="${escapeAttr(v)}"></option>`).join('');
     document.getElementById('rs_ocupacionesList').innerHTML = occupations.map((v) => `<option value="${escapeAttr(v)}"></option>`).join('');
     document.getElementById('rs_filtroPrueba').innerHTML = '<option value="">[Todas]</option>' + pruebas.map((v) => `<option value="${escapeAttr(v)}">${escapeHtml(v)}</option>`).join('');
     document.getElementById('rs_filtroFactor').innerHTML = '<option value="">[Todos]</option>' + factores.map((v) => `<option value="${escapeAttr(v)}">${escapeHtml(v)}</option>`).join('');
   }
 
+  function setupDniSearchbox() {
+    const root = document.getElementById('rs_dniSearchbox');
+    const input = document.getElementById('rs_filtroDniSearch');
+    const hidden = document.getElementById('rs_filtroDni');
+    const menu = document.getElementById('rs_dniSearchboxMenu');
+    const clearBtn = document.getElementById('rs_btnLimpiarDni');
+    if (!root || !input || !hidden || !menu || !clearBtn) return;
+
+    const openMenu = () => {
+      state.dniSearchboxOpen = true;
+      root.classList.add('is-open');
+      renderDniOptions(input.value);
+    };
+
+    const closeMenu = () => {
+      state.dniSearchboxOpen = false;
+      root.classList.remove('is-open');
+    };
+
+    input.addEventListener('focus', openMenu);
+    input.addEventListener('click', openMenu);
+    input.addEventListener('input', () => {
+      hidden.value = '';
+      openMenu();
+    });
+    input.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Enter') {
+        ev.preventDefault();
+        const first = menu.querySelector('[data-dni]');
+        if (first) selectDniOption(first.dataset.dni);
+        applyFilters();
+      }
+      if (ev.key === 'Escape') closeMenu();
+    });
+
+    clearBtn.addEventListener('click', () => {
+      clearDniFilter();
+      applyFilters();
+      input.focus();
+    });
+
+    menu.addEventListener('mousedown', (ev) => {
+      ev.preventDefault();
+      const option = ev.target.closest('[data-dni]');
+      if (!option) return;
+      selectDniOption(option.dataset.dni);
+      applyFilters();
+    });
+
+    document.addEventListener('mousedown', (ev) => {
+      if (!root.contains(ev.target)) closeMenu();
+    });
+  }
+
+  function renderDniOptions(query = '') {
+    const menu = document.getElementById('rs_dniSearchboxMenu');
+    if (!menu) return;
+    const needle = normalizeText(query);
+    const options = (state.dniOptions || [])
+      .filter((item) => !needle
+        || normalizeText(item.dni).includes(needle)
+        || normalizeText(item.paciente).includes(needle)
+        || normalizeText(item.historiaClinica).includes(needle))
+      .slice(0, 8);
+
+    if (!options.length) {
+      menu.innerHTML = '<div class="rs-dni-searchbox-empty">No se encontraron DNIs.</div>';
+      return;
+    }
+
+    menu.innerHTML = options.map((item) => `
+      <button type="button" class="rs-dni-searchbox-option" data-dni="${escapeAttr(item.dni)}" role="option">
+        <span class="rs-dni-searchbox-dni">${escapeHtml(item.dni)}</span>
+        <span class="rs-dni-searchbox-person">${escapeHtml(item.paciente)}</span>
+        <span class="rs-dni-searchbox-hc">${escapeHtml(item.historiaClinica)}</span>
+      </button>
+    `).join('');
+  }
+
+  function selectDniOption(dni) {
+    const selected = (state.dniOptions || []).find((item) => item.dni === dni);
+    if (!selected) return;
+    document.getElementById('rs_filtroDni').value = selected.dni;
+    document.getElementById('rs_filtroDniSearch').value = `${selected.dni} · ${selected.paciente}`;
+    document.getElementById('rs_dniSearchbox')?.classList.remove('is-open');
+    state.dniSearchboxOpen = false;
+  }
+
+  function clearDniFilter() {
+    const hidden = document.getElementById('rs_filtroDni');
+    const input = document.getElementById('rs_filtroDniSearch');
+    if (hidden) hidden.value = '';
+    if (input) input.value = '';
+    renderDniOptions('');
+  }
+
   function clearFilters() {
     ['rs_filtroEmpresa', 'rs_filtroHistoria', 'rs_filtroOcupacion', 'rs_filtroFechaDesde', 'rs_filtroFechaHasta'].forEach((id) => { document.getElementById(id).value = ''; });
+    clearDniFilter();
     document.getElementById('rs_filtroPrueba').value = '';
     document.getElementById('rs_filtroFactor').value = '';
     document.getElementById('rs_chkSoloFuera').checked = false;
@@ -87,6 +191,7 @@
     const empresa = valueOf('rs_filtroEmpresa');
     const historia = valueOf('rs_filtroHistoria');
     const ocupacion = valueOf('rs_filtroOcupacion');
+    const dni = valueOf('rs_filtroDni');
     const desde = document.getElementById('rs_filtroFechaDesde').value;
     const hasta = document.getElementById('rs_filtroFechaHasta').value;
     const prueba = document.getElementById('rs_filtroPrueba').value;
@@ -98,6 +203,7 @@
       const hasFactor = !factor || record.pruebas.some((p) => p.factores.some((f) => f.nombre === factor));
       return (!empresa || record.empresa.toLowerCase().includes(empresa))
         && (!historia || record.historiaClinica.toLowerCase().includes(historia))
+        && (!dni || String(record.dni || '').includes(dni))
         && (!ocupacion || record.ocupacion.toLowerCase().includes(ocupacion))
         && (!desde || record.fechaISO >= desde)
         && (!hasta || record.fechaISO <= hasta)
@@ -132,7 +238,7 @@
     document.getElementById('rs_resultSummary').innerHTML = `<i class="fas fa-filter"></i>${state.filteredRecords.length} registros / <span class="text-warning-emphasis">${yellowCount} reevaluables</span> / <span class="text-danger-emphasis">${redCount} aperturables</span>`;
 
     if (!state.filteredRecords.length) {
-      tbody.innerHTML = emptyRow(8, 'No existen registros con los filtros aplicados.');
+      tbody.innerHTML = emptyRow(9, 'No existen registros con los filtros aplicados.');
       activateTooltips();
       return;
     }
@@ -142,6 +248,7 @@
         <tr>
           <td>${escapeHtml(record.episodio)}</td>
           <td>${escapeHtml(record.historiaClinica)}</td>
+          <td>${escapeHtml(record.dni)}</td>
           <td>${escapeHtml(record.paciente)}</td>
           <td>${escapeHtml(record.empresa)}</td>
           <td>${escapeHtml(record.ocupacion)}</td>
@@ -568,6 +675,14 @@
     return document.getElementById(id).value.trim().toLowerCase();
   }
 
+  function normalizeText(value) {
+    return String(value || '')
+      .trim()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+  }
+
   function escapeHtml(value) {
     return String(value ?? '')
       .replace(/&/g, '&amp;')
@@ -618,6 +733,7 @@
         id: 1,
         episodio: '00852026017279',
         historiaClinica: 'HC-001245',
+        dni: '46271839',
         paciente: 'Acco Pino Jonathan Henry',
         empresa: 'MINERA SOTRAMI S.A.',
         ocupacion: 'Operador de planta',
@@ -666,6 +782,7 @@
         id: 2,
         episodio: '00872026020152',
         historiaClinica: 'HC-001284',
+        dni: '70519384',
         paciente: 'Acuña Clemente Odemary Luzverily',
         empresa: 'COMPAÑÍA DE MINAS BUENAVENTURA S.A.A.',
         ocupacion: 'Operaria',
@@ -698,6 +815,7 @@
         id: 3,
         episodio: '00872026020150',
         historiaClinica: 'HC-001286',
+        dni: '43821976',
         paciente: 'Acuña Clemente Odemary Luzverily',
         empresa: 'COMPAÑÍA DE MINAS BUENAVENTURA S.A.A.',
         ocupacion: 'Operaria',
@@ -748,6 +866,7 @@
         id: 4,
         episodio: '00912026020031',
         historiaClinica: 'HC-001315',
+        dni: '72951460',
         paciente: 'Benites Rojas Carmen Luisa',
         empresa: 'MINERA CHINALCO PERÚ S.A.',
         ocupacion: 'Supervisora de turno',
@@ -781,6 +900,7 @@
         id: 5,
         episodio: '00912026020048',
         historiaClinica: 'HC-001327',
+        dni: '41608372',
         paciente: 'Castañeda Huamán Diego Alberto',
         empresa: 'SOUTHERN PERU COPPER CORPORATION',
         ocupacion: 'Mecánico de mantenimiento',
@@ -816,6 +936,7 @@
         id: 6,
         episodio: '00932026020060',
         historiaClinica: 'HC-001340',
+        dni: '76194258',
         paciente: 'Chávez Montalvo Fiorella Andrea',
         empresa: 'MINSUR S.A.',
         ocupacion: 'Analista de laboratorio',
@@ -862,6 +983,7 @@
         id: 7,
         episodio: '00942026020077',
         historiaClinica: 'HC-001355',
+        dni: '45289013',
         paciente: 'Dávila Gómez Manuel Esteban',
         empresa: 'SHOUGANG HIERRO PERÚ S.A.A.',
         ocupacion: 'Operador de camión',
@@ -894,6 +1016,7 @@
         id: 8,
         episodio: '00952026020088',
         historiaClinica: 'HC-001366',
+        dni: '67823591',
         paciente: 'Espinoza Salas Rosa Milagros',
         empresa: 'NEXA RESOURCES PERÚ S.A.A.',
         ocupacion: 'Técnica de seguridad',
@@ -926,6 +1049,7 @@
         id: 9,
         episodio: '00962026020094',
         historiaClinica: 'HC-001374',
+        dni: '73491025',
         paciente: 'Flores Cárdenas Kevin Martín',
         empresa: 'CONSORCIO MINERO HORIZONTE',
         ocupacion: 'Ayudante general',
@@ -962,6 +1086,7 @@
         id: 10,
         episodio: '00972026020102',
         historiaClinica: 'HC-001389',
+        dni: '40957268',
         paciente: 'Gómez Rivas Liliana Patricia',
         empresa: 'VOLCAN COMPAÑÍA MINERA S.A.A.',
         ocupacion: 'Administrativa',
@@ -996,6 +1121,7 @@
         id: 11,
         episodio: '00982026020118',
         historiaClinica: 'HC-001401',
+        dni: '48612037',
         paciente: 'Huamán Quispe Jorge Luis',
         empresa: 'MARCOBRE S.A.C.',
         ocupacion: 'Chofer de transporte interno',
@@ -1028,6 +1154,7 @@
         id: 12,
         episodio: '00992026020127',
         historiaClinica: 'HC-001415',
+        dni: '71963840',
         paciente: 'Ibarra Peña Sandra Beatriz',
         empresa: 'ANTAMINA S.A.',
         ocupacion: 'Asistente de almacén',
